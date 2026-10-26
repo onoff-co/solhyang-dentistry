@@ -7,4 +7,5 @@ await rm(target,{recursive:true,force:true});await mkdir(target,{recursive:true}
 await cp(path.join(root,'web'),target,{recursive:true});
 for(const directory of ['assets','shared'])await cp(path.join(root,directory),path.join(target,directory),{recursive:true});
 for(const name of ['hero','sedation','consultation','care','team','teeth','guide','child'])if((await stat(path.join(target,'assets',name+'.webp'))).size<1000)throw new Error('Missing original asset '+name);
-console.log('Solhyang web build complete · 8 original images · server APIs retained.');
+if((await stat(path.join(target,'assets','preservation.jpg'))).size<1000)throw new Error('Missing preservation image');
+console.log('Solhyang web build complete · 9 original images · server APIs retained.');

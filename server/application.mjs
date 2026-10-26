@@ -44,9 +44,9 @@ export function createApplication({databasePath,key,now=()=>new Date(),productio
    else if(pathname.startsWith('/assets/')){root=path.join(project,'assets');relative=decodeURIComponent(pathname.slice(7));}
    else if(pathname.startsWith('/shared/')){root=path.join(project,'shared');relative=decodeURIComponent(pathname.slice(7));}
    else{root=path.join(project,'web');relative=decodeURIComponent(pathname==='/'?'/index.html':pathname);}
-   const file=path.resolve(root,'.'+relative);if(!file.startsWith(root+path.sep)||!['.html','.mjs','.css','.webp','.svg','.woff2'].includes(path.extname(file)))throw new RequestError(404,'페이지를 찾을 수 없습니다.');
+   const file=path.resolve(root,'.'+relative);if(!file.startsWith(root+path.sep)||!['.html','.mjs','.css','.jpg','.webp','.svg','.woff2'].includes(path.extname(file)))throw new RequestError(404,'페이지를 찾을 수 없습니다.');
    let bytes;try{bytes=await readFile(file);}catch{throw new RequestError(404,'페이지를 찾을 수 없습니다.');}
-   const mime={'.html':'text/html; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.webp':'image/webp','.svg':'image/svg+xml','.woff2':'font/woff2'}[path.extname(file)];
+   const mime={'.html':'text/html; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.jpg':'image/jpeg','.webp':'image/webp','.svg':'image/svg+xml','.woff2':'font/woff2'}[path.extname(file)];
    res.writeHead(200,{...security,'Content-Type':mime});res.end(req.method==='HEAD'?undefined:bytes);
   }catch(error){if(error instanceof RequestError)json(error.status,{error:{message:error.message,fields:error.fields}});else{console.error('Request failed:',error.code||error.name);json(500,{error:{message:'처리하지 못했습니다. 잠시 후 다시 시도해 주세요.'}});}}
  });
