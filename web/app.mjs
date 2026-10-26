@@ -2,7 +2,9 @@ import {landing} from './landing.mjs';
 import {treatments,treatment,clinic} from '/shared/catalog.mjs';
 import {icon,action,api,escapeText as e} from './ui.mjs';
 import {createReservations} from './reservations.mjs';
+import {staticHosting} from './deployment.mjs';
 document.querySelector('#landing').innerHTML=landing();
+if(staticHosting)document.querySelector('.bottom-consult').hidden=true;
 for(const node of document.querySelectorAll('[data-icon]'))node.insertAdjacentHTML('afterbegin',icon(node.dataset.icon));
 document.querySelector('#quick-service').innerHTML=treatments.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
 const dialog=document.querySelector('#content-dialog'),workspace=document.querySelector('#workspace');
@@ -10,6 +12,7 @@ function notify(text){const el=document.querySelector('#toast');el.textContent=t
 function openDialog(title,html){document.querySelector('#dialog-content').innerHTML=`<h2 id="dialog-title">${e(title)}</h2>${html}`;if(!dialog.open)dialog.showModal();}
 const closeDialog=()=>dialog.close();
 const reservations=createReservations({root:workspace,notify,openDialog,closeDialog});
+function bookingNotice(){return `<div class="empty-panel"><h1>온라인 접수 안내</h1><p>온라인 예약과 상담 접수는 준비 중입니다.<br>현재 진료 소개와 이용 안내를 확인하실 수 있습니다.</p>${action('#contact','진료시간과 위치 안내','line')}</div>`;}
 const quickControl=document.querySelector('.quick-control'),quickToggle=document.querySelector('#quick-toggle'),quickLinks=document.querySelector('#quick-links');
 function setQuickMenu(open){quickToggle.setAttribute('aria-expanded',String(open));quickLinks.hidden=!open;quickToggle.querySelector('.quick-toggle-label').textContent=open?'닫기':'빠른 메뉴';}
 quickToggle.addEventListener('click',()=>setQuickMenu(quickToggle.getAttribute('aria-expanded')!=='true'));
@@ -23,7 +26,7 @@ async function route(){
  const [hash,query='']=(location.hash.slice(1)||'home').split('?'),isWorkflow=['booking','reservations'].includes(hash);
  document.querySelector('#landing').hidden=isWorkflow;workspace.hidden=!isWorkflow;document.body.classList.toggle('workflow-open',isWorkflow);
  document.querySelector('.header nav').classList.remove('expanded');document.querySelector('#mobile-menu').setAttribute('aria-expanded','false');closeDialog();
- if(isWorkflow){await reservations.open(hash,new URLSearchParams(query).get('service'));workspace.scrollIntoView({block:'start'});}
+ if(isWorkflow){if(staticHosting)workspace.innerHTML=bookingNotice();else await reservations.open(hash,new URLSearchParams(query).get('service'));workspace.scrollIntoView({block:'start'});}
  else document.getElementById(hash)?.scrollIntoView({block:'start',behavior:'smooth'});
  document.title='솔향치과';document.querySelectorAll('.header nav a').forEach(a=>{if(a.hash==='#'+hash)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
 }
@@ -41,7 +44,7 @@ document.addEventListener('click',async event=>{
  const button=event.target.closest('button');if(!button)return;
  if(button.hasAttribute('data-close'))return closeDialog();
  if(button.id==='mobile-menu'){const expanded=button.getAttribute('aria-expanded')!=='true';button.setAttribute('aria-expanded',expanded);document.querySelector('.header nav').classList.toggle('expanded',expanded);return;}
- if(button.dataset.open==='consult')return consultation();if(button.dataset.open==='privacy')return privacy();
+ if(button.dataset.open==='consult'){if(staticHosting)return openDialog('온라인 상담 안내',bookingNotice());return consultation();}if(button.dataset.open==='privacy')return privacy();
  if(button.dataset.treatment)return detail(button.dataset.treatment);
  if(button.hasAttribute('data-copy-address')){try{await navigator.clipboard.writeText(clinic.address);notify('주소를 복사했습니다.');}catch{openDialog('오시는 길',`<p>${e(clinic.address)}</p>`);}return;}
  await reservations.click(button);

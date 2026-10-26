@@ -68,4 +68,11 @@ npm start
 - `tests/`: 서버 API·시간 정책·지속성·보안 검증
 - `assets/`: 솔향치과용 고유 생성 이미지와 SVG 파비콘
 
-GitHub Actions에서 테스트·빌드·의존성 검사를 수행합니다. 공개 서버 배포는 별도 설정입니다.
+GitHub Actions에서 테스트·빌드·의존성 검사를 수행합니다.
+
+## GitHub Pages
+
+`main` push 시 `.github/workflows/pages.yml`이 테스트와 검사를 통과한 화면을 자동 배포합니다.
+주소: https://onoff-co.github.io/solhyang-dentistry/
+
+`npm run build:pages`는 이미지·모듈 경로를 저장소 하위 경로에서도 사용할 수 있게 변환합니다. 배포물은 `dist/`에 생성되며 서버 코드, DB, 저장 키는 포함하지 않습니다. Pages에서는 온라인 예약·상담에 접수 준비 안내를 표시하며 개인정보 입력 폼을 제공하지 않습니다. 실제 예약·조회·변경·취소 및 상담 저장은 위 Node.js 서버 배포 방법으로 운영해야 합니다. `npm run build`는 기존 서버 동작을 유지합니다.
