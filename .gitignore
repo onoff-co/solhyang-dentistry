@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env*
+.local/
+*.db
+*.db-shm
+*.db-wal
+*.pem
+*.key
+coverage/

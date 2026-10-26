@@ -1,0 +1,10 @@
+﻿import {cp,mkdir,stat,rm} from 'node:fs/promises';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=path.resolve(fileURLToPath(new URL('..',import.meta.url))),target=path.join(root,'dist');
+if(path.resolve(target)!==path.join(root,'dist'))throw new Error('Unexpected build directory');
+await rm(target,{recursive:true,force:true});await mkdir(target,{recursive:true});
+await cp(path.join(root,'web'),target,{recursive:true});
+for(const directory of ['assets','shared'])await cp(path.join(root,directory),path.join(target,directory),{recursive:true});
+for(const name of ['hero','sedation','consultation','care','team','teeth','guide','child'])if((await stat(path.join(target,'assets',name+'.webp'))).size<1000)throw new Error('Missing original asset '+name);
+console.log('Solhyang web build complete · 8 original images · server APIs retained.');
